@@ -1,0 +1,17 @@
+---
+- hosts: test-kitchen
+  become: True
+  tasks:
+  - name: Add new instance to host group
+    add_host:
+      hostname: "{{ inventory_hostname }}"
+      groupname: "{{ item }}"
+    with_items:
+      - nodejs
+      - helloworld 
+
+- hosts: test-kitchen
+  become: True
+  roles:
+    - geerlingguy.nodejs
+    - msdeploy

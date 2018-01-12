@@ -1,0 +1,41 @@
+---
+- name: find existing ami with the same name
+  ec2_ami_find:
+    name: "{{ build_image_name }}-*"
+    region: "{{ region }}"
+    sort: name
+    sort_order: descending
+    sort_end: 1
+  register: ami_find
+
+- name: deregister existing ami
+  ec2_ami:
+    region: "{{ region }}"
+    image_id: "{{ ami_find.results.0.ami_id }}"
+    delete_snapshot: True
+    state: absent
+  when: ami_find.results | length > 0
+
+- debug:
+    msg: "Existing ami: {{ ami_find.results.0.ami_id }}"
+  when: ami_find.results | length > 0
+
+- name: save instance as ami
+  ec2_ami:
+    region: "{{ region }}"
+    instance_id: "{{ ec2.instances.0.id }}"
+    wait: yes
+    name: "{{ build_image_name }}-{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}"
+    tags:
+      Name: latest
+      Service: "{{ service_name }}"
+  register: image
+
+- debug:
+    msg: "{{ image }}"
+
+- name: Terminate instances that were previously launched
+  ec2:
+    state: "absent"
+    region: "{{ region }}"
+    instance_ids: "{{ ec2.instance_ids }}"

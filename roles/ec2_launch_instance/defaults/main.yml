@@ -1,0 +1,14 @@
+# instance type
+instance_type: t2.small
+
+# which AMI template to use.
+# if multiple images with name {{ ami_template_name}}-* are found, the one with latest creation date will be used
+ami_template_name: ami-ubuntu16-template-current
+
+# in which region, which security group id to apply, and in which subnet
+region: eu-central-1
+group_id: [sg-86f454ed, sg-47b6592d]
+subnet_id: subnet-0a673a62
+
+# which ansible group to assign to this host, in order to load group vars
+groupname: helloworld

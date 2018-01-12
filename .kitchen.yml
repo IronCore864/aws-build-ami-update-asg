@@ -1,0 +1,24 @@
+---
+driver:
+  name: docker
+  use_sudo: False
+
+provisioner:
+  name: ansible_playbook
+  hosts: test-kitchen
+  ansible_version: latest
+  roles_path: roles
+  group_vars_path: inventories/dev/group_vars
+
+verifier:
+  root_path: /opt/verifier
+
+platforms:
+  - name: ubuntu-16.04
+    driver_config:
+      image: ironcore864/ubuntu16-ansible-systemd
+      run_command: /sbin/init
+      run_options: --security-opt seccomp=unconfined --tmpfs /run --tmpfs /run/lock -v /sys/fs/cgroup:/sys/fs/cgroup:ro -t
+
+suites:
+  - name: default

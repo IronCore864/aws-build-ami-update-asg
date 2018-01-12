@@ -1,0 +1,9 @@
+# Set the version of Node.js to install ("0.12", "4.x", "5.x", "6.x", "8.x").
+# Version numbers from Nodesource: https://github.com/nodesource/distributions
+nodejs_version: "8.x"
+
+nodejs_npm_global_packages:
+  - name: pm2
+
+# The directory for global installations.
+npm_config_prefix: "/usr/local/lib/npm"

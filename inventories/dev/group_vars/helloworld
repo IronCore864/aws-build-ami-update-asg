@@ -1,0 +1,8 @@
+# service config
+service_name: helloworld 
+service_port: 8080 
+
+# service user, repo, and installation directory
+user: "{{ service_name }}"
+install_dir: "/opt/{{ service_name }}"
+repo: https://github.com/IronCore864/node-backend-service-example.git

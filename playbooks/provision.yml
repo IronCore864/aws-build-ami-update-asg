@@ -1,0 +1,15 @@
+---
+- name: Provisioning EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  roles:
+    - ec2_launch_instance
+
+- name: Build instance
+  hosts: helloworld 
+  become: True
+  gather_facts: True
+  roles:
+    - geerlingguy.nodejs 
+    - msdeploy

@@ -1,0 +1,52 @@
+---
+- name: ensure service user exists
+  user:
+    name: "{{ user }}"
+    comment: "User for {{ service_name }} service"
+    state: present
+
+- name: Creates directory
+  file:
+    path: "{{ install_dir }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0775
+
+- name: Clone {{ service_name }} repo
+  become_user: "{{ user }}"
+  git:
+    repo: "{{ repo }}"
+    dest: "{{ install_dir }}"
+    accept_hostkey: yes
+    force: yes
+
+- name: Config
+  template:
+    src: "{{ service_name }}.json.j2"
+    dest: "{{ install_dir }}/config/local.json"
+    owner: "{{ user }}"
+    group: "{{ user }}"
+    mode: 0644
+
+- name: Set NODE_ENV in ecosystem.config.json
+  become_user: "{{ user }}"
+  replace:
+    path: "{{ install_dir }}/ecosystem.config.json"
+    regexp: '("NODE_ENV": ?").*(",?$)'
+    replace: '\1{{ env_name }}\2'
+
+- name: Install packages based on package.json
+  become_user: "{{ user }}"
+  command: npm install chdir={{ install_dir }}
+  async: 300
+  poll: 5
+
+- name: Start app
+  become_user: "{{ user }}"
+  command: "{{ npm_config_prefix }}/bin/pm2 start ecosystem.config.json chdir={{ install_dir }}"
+
+- name: Config pm2 boot on startup
+  become: True
+  command: "{{ npm_config_prefix }}/bin/pm2 startup -u {{ user }} --hp /home/{{ user }}"
+
