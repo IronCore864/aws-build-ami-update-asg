@@ -1,5 +1,33 @@
 ---
-- name: Provisioning EC2 Instance
+- name: set facts
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tasks:
+  - set_fact:
+      service_name: "helloworld"
+  - set_fact:
+      build_image_name_var: "{{ service_name }}_build_image_name"
+      lc_name_prefix_var: "{{ service_name }}_lc_name_prefix"
+      service_sg_ids_var: "{{ service_name }}_sg_ids"
+      asg_name_var: "{{ service_name }}_asg_name"
+      name_tag_var: "{{ service_name }}_instance_name_tag"
+      asg_max_size_var: "{{ service_name }}_asg_max_size"
+      asg_min_size_var: "{{ service_name }}_asg_min_size"
+      asg_desired_capacity_var: "{{ service_name }}_asg_desired_capacity"
+
+  - set_fact:
+      build_image_name: "{{ hostvars[inventory_hostname][build_image_name_var] }}"
+      ansible_group_name: "{{ service_name }}"
+      lc_name_prefix: "{{ hostvars[inventory_hostname][lc_name_prefix_var] }}"
+      service_sg_ids: "{{ hostvars[inventory_hostname][service_sg_ids_var] }}"
+      asg_name: "{{ hostvars[inventory_hostname][asg_name_var] }}"
+      name_tag: "{{ hostvars[inventory_hostname][name_tag_var] }}"
+      asg_max_size: "{{ hostvars[inventory_hostname][asg_max_size_var] }}"
+      asg_min_size: "{{ hostvars[inventory_hostname][asg_min_size_var] }}"
+      asg_desired_capacity: "{{ hostvars[inventory_hostname][asg_desired_capacity_var] }}"
+
+- name: Provision an EC2 Instance
   hosts: localhost
   connection: local
   gather_facts: False
@@ -7,9 +35,22 @@
     - ec2_launch_instance
 
 - name: Build instance
-  hosts: helloworld 
+  hosts: helloworld
   become: True
   gather_facts: True
   roles:
-    - geerlingguy.nodejs 
-    - msdeploy
+    - geerlingguy.nodejs
+    - service_deploy
+    - geerlingguy.filebeat
+
+- name: Save AMI and terminate instances, and rolling ASG update
+  hosts: localhost
+  connection: local
+  roles:
+    - ec2_save_ami_and_terminate_instance
+
+- name: Rolling ASG update
+  hosts: localhost
+  connection: local
+  roles:
+    - ec2_rolling_asg_update

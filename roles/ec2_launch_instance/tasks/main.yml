@@ -18,7 +18,7 @@
     instance_type: "{{ instance_type }}"
     image: "{{ ami_find.results[0].ami_id }}"
     region: "{{ region }}"
-    vpc_subnet_id: "{{ subnet_id }}"
+    vpc_subnet_id: "{{ image_building_subnet_id }}"
   register: ec2
 
 - debug:
@@ -30,7 +30,7 @@
 - name: Add new instance to host group
   add_host:
     hostname: "{{ item.private_ip }}"
-    groupname: "{{ group_name }}"
+    groupname: "{{ ansible_group_name }}"
   with_items: "{{ ec2.instances }}"
 
 - name: Wait for SSH to come up

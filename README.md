@@ -1,32 +1,16 @@
 # An AWS solution with ansible to deploy a dev micro service env
 
-It creates an EC2 instance, run the playbook `provision.yml` which installs nodejs and a helloworld node service with pm2 registered as a service.
+It creates an EC2 instance, run the playbook `provision.yml` which installs nodejs and a helloworld node service with pm2.
 
-Role `ec2_save_ami_and_terminate_instance` can save the image launched previously in the playbook as an AMI
+Role `ec2_save_ami_and_terminate_instance` save the image launched previously in the playbook as an AMI, so that when autoscaling happens the instance will be ready as long as it's up and running.
 
-And role `ec2_rolling_asg_update` can create a launch config with the new AMI, update an existing auto scaling group, and deploy instances in a rolling fashion so no down time.
+Role `ec2_rolling_asg_update` can create a launch config with the new AMI, update an existing auto scaling group, and deploy instances in a rolling fashion so no down time.
 
-These two roles are not in the playbook because they depends on an existing auto scaling group.
 
 ## Dependencies
 
 - Ansible, version >= 2.0
 - Python with boto
-
-## Local Test with Docker and Test Kitchen
-
-To install test dependencies:
-
-    gem install bundler
-    bundle
-
-Run test:
-
-    kitchen test
-
-Destroy:
-
-    kitchen destroy
 
 ## AWS Requirements
 

@@ -1,3 +1,0 @@
----
-- include_tasks: create_lc_and_update_asg.yml
-  when: replace_instance

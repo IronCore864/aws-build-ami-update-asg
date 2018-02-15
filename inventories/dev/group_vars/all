@@ -1,1 +1,26 @@
-env_name: development
+# for ansible building image in aws ec2
+# because of this change: https://github.com/ansible/ansible/pull/31484 we can no longer get env from inventory_dir so it needs to be specified as a variable
+env_name: rel
+region: eu-central-1
+image_building_subnet_id: subnet-yyy
+ms_subnet_id: subnet-xxx
+ami_template_name: ami-ubuntu-xxx
+instance_type: t2.small
+
+# sg ids for building ami
+group_id: [sg-xxx]
+
+# default branch to use
+service_version: master
+
+# Helloworld service
+helloworld_service_name: helloworld
+# [default, fkt-autoscale-helloworld-01]
+helloworld_sg_ids: [sg-86f454ed, sg-afc548c5]
+helloworld_asg_name: "{{ helloworld_service_name }}-asg"
+helloworld_lc_name_prefix: "{{ helloworld_service_name }}-lc"
+helloworld_instance_name_tag: "{{ helloworld_service_name }}-service"
+helloworld_build_image_name: ansible-build-helloworld-image
+helloworld_asg_max_size: 1
+helloworld_asg_min_size: 1
+helloworld_asg_desired_capacity: 1
